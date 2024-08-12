@@ -16,9 +16,14 @@
     "python.analysis.packageIndexDepths": [
         {
             "name": "django",
-            "depth": 4,
+            "depth": 5,
             "includeAllSymbols": true
-        }
+        }, 
+        {
+            "name": "rest_framework_simplejwt",
+            "depth": 5,
+            "includeAllSymbols": true
+        }, 
     ],
       
     "[python]": {

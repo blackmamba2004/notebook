@@ -16,7 +16,7 @@
     "python.analysis.packageIndexDepths": [
         {
             "name": "django",
-            "depth": 3,
+            "depth": 4,
             "includeAllSymbols": true
         }
     ],

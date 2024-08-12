@@ -14,9 +14,29 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf import Settings
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from backend_api.views import *
+from rest_framework import routers
+from .settings import DEBUG
+# router = routers.DefaultRouter()
+# router.register(r'note', NoteViewSet, basename='note')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/v1/note/', NoteAPIList.as_view()), 
+    path('api/v1/note/<int:pk>/', NoteAPIUpdate.as_view()),
+    path('api/v1/note/delete/<int:pk>/', NoteAPIDestroy.as_view())
+    # path('api/v1/notedetail/<int:pk>/', NoteAPIDetailView.as_view())
+    # path('api/v1/notelist/', NoteViewSet.as_view({'get': 'list'})), 
+    # path('api/v1/notelist/<int:pk>/', NoteViewSet.as_view({'put': 'update'}))
+    # path('api/v1/', include(router.urls)), 
 ]
+
+
+if DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)), 
+    ] + urlpatterns

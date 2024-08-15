@@ -1,6 +1,7 @@
 from django.db import models
-from users.models import User
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 class Note(models.Model):
     title = models.CharField(verbose_name='Заголовок заметки', max_length=255)

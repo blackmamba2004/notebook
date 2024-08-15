@@ -1,4 +1,6 @@
 from rest_framework import permissions
+
+
 class IsAdminOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
         print('called has_object_permission')
@@ -19,6 +21,4 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 
         # Instance must have an attribute named `owner`.
         else:
-            print('called has_object_permission')
             return obj.author == request.user
-        

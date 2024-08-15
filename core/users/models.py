@@ -16,7 +16,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         FEMALE = 'F', 'Female'
     
     email = models.EmailField(_('email address'), unique=True, 
-                              error_messages=_('user with this email address already exists'))
+                              error_messages={'unique': _('user with this email address already exists')})
     
     first_name = models.CharField(_('first name'), max_length=45, blank=True)
     last_name = models.CharField(_('last name'), max_length=45, blank=True)

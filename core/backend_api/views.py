@@ -2,7 +2,7 @@ from django.http import HttpRequest
 from django.shortcuts import render
 from django.views.generic import detail
 from notes.models import Note
-from .serializers import NoteSerializer
+from .serializers import NoteSerializer, UserSerializer
 from rest_framework.decorators import action
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -122,7 +122,7 @@ class NoteAPIList(generics.ListCreateAPIView):
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, )
-    
+
 
 class NoteAPIUpdate(generics.RetrieveUpdateAPIView):
     queryset = Note.objects.all()
@@ -142,19 +142,27 @@ class NoteAPIDestroy(generics.RetrieveDestroyAPIView):
 #     serializer_class = NoteSerializer
 
 
-# class NoteViewSet(viewsets.ModelViewSet):
-#     # queryset = Note.objects.all()
-#     serializer_class = NoteSerializer
-
-#     def get_queryset(self):
-#         pk = self.kwargs.get('pk')
-
-#         if not pk:
-#             return Note.objects.all()
+class NoteViewSet(viewsets.ModelViewSet):
+    
+    queryset = Note.objects.select_related('author').all()
+    serializer_class = NoteSerializer
+    
+    def get_permissions(self):
         
-#         return Note.objects.filter(pk=pk)
+        if self.action in ['create']:
+            permission_classes = [IsAuthenticated]
+        
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            permission_classes = [IsOwnerOrReadOnly]
+        
+        else:
+            permission_classes = [IsAuthenticatedOrReadOnly]
 
-#     @action(methods=['get'], detail=True)
-#     def author(self, request: HttpRequest, pk=None) -> Response:
-#         user = User.objects.get(pk=pk)
-#         return Response({'authors': [user.username]})
+        return [permission() for permission in permission_classes]
+
+    @action(methods=['get'], detail=True, url_path='author', permission_classes=IsOwnerOrReadOnly)
+    def author(self, request: HttpRequest, pk=None):
+        note = self.get_object()
+        user = note.author
+        return Response({'author': UserSerializer(user).data})
+    

@@ -17,7 +17,6 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include, re_path
 from backend_api.views import NoteViewSet
-# from backend_api.views import CustomLoginView
 from rest_framework_simplejwt import views
 from rest_framework import routers
 from .settings import DEBUG
@@ -28,24 +27,9 @@ router.register(r'notes', NoteViewSet, basename='notes')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include(router.urls)),
-    # path('api/v1/drf-auth/', include('rest_framework.urls')),
-    # path('api/v1/note/', NoteAPIList.as_view()), 
-    # path('api/v1/note/<int:pk>/', NoteAPIUpdate.as_view()),
-    # path('api/v1/note/delete/<int:pk>/', NoteAPIDestroy.as_view()),
-
-
-    # path('api/v1/auth/', include('djoser.urls')),
-    # re_path(r'^auth/', include('djoser.urls.authtoken')),
-    # path('api/v1/token/', CustomLoginView.as_view(), name='token_obtain_pair'),
     path('api/v1/token/', views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/v1/token/refresh/', views.TokenRefreshView.as_view(), name='token_refresh'),
     path('api/v1/token/verify/', views.TokenVerifyView.as_view(), name='token_verify'),
-
-
-    # path('api/v1/notedetail/<int:pk>/', NoteAPIDetailView.as_view())
-    # path('api/v1/notelist/', NoteViewSet.as_view({'get': 'list'})), 
-    # path('api/v1/notelist/<int:pk>/', NoteViewSet.as_view({'put': 'update'}))
-    # path('api/v1/', include(router.urls)), 
 ]
 
 

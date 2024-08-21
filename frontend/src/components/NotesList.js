@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const NotesList = () => {
     const [notes, setNotes] = useState([]);
@@ -8,7 +9,7 @@ const NotesList = () => {
     useEffect(() => {
         const fetchNotes = async () => {
             try {
-                const response = await axios.get('/api/v1/notes/');
+                const response = await axios.get('/notes/');
                 setNotes(response.data);
             } catch (err) {
                 setError('Error fetching notes');
@@ -28,9 +29,9 @@ const NotesList = () => {
             <ul>
                 {notes.map(note => (
                     <li key={note.id}>
-                        <h1>{note.id}</h1>
-                        <h3>{note.title}</h3>
-                        <p>{note.content}</p>
+                        <Link to={`/notes/${note.id}/`}>
+                            <h3>{note.title}</h3>
+                        </Link>
                     </li>
                 ))}
             </ul>

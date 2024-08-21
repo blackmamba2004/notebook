@@ -27,9 +27,9 @@ router.register(r'notes', NoteViewSet, basename='notes')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include(router.urls)),
-    path('api/v1/token/', views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('api/v1/token/refresh/', views.TokenRefreshView.as_view(), name='token_refresh'),
-    path('api/v1/token/verify/', views.TokenVerifyView.as_view(), name='token_verify'),
+    # path('api/v1/token/', views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # path('api/v1/token/refresh/', views.TokenRefreshView.as_view(), name='token_refresh'),
+    # path('api/v1/token/verify/', views.TokenVerifyView.as_view(), name='token_verify'),
 ]
 
 

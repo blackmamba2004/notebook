@@ -11,14 +11,19 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class NoteDetailSerializer(serializers.ModelSerializer):
-    # author = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    author = serializers.CharField(source='author.username')
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Note
         fields = ['id', 'title', 'content', 'author']
-
 
 class NoteListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Note
         fields = ['id', 'title']
+
+
+class EmailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['email']
+

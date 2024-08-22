@@ -1,23 +1,24 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
+from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 from django.utils.translation import gettext_lazy as _
-from .forms import CustomUserCreationForm, CustomUserChangeForm
 
 User = get_user_model()
 
 class CustomUserAdmin(UserAdmin):
     fieldsets = (
-        (None, {'fields': ('email', 'password')}),
+        (None, {'fields': ('username', 'password',)}),
         (
             _('Personal info'), 
             {
                 'fields': (
                     'first_name', 
                     'last_name', 
+                    'email',
                     'gender', 
-                    'birth_date'
+                    'birth_date',
                 )
             }
         ),
@@ -29,7 +30,7 @@ class CustomUserAdmin(UserAdmin):
                     'is_staff', 
                     'is_superuser', 
                     'groups', 
-                    'user_permissions'
+                    'user_permissions',
                 )
             }
         ),
@@ -39,7 +40,7 @@ class CustomUserAdmin(UserAdmin):
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_active')}
+            'fields': ('email', 'password1', 'password2', 'is_staff', 'is_active',)}
         ),
     )
     
@@ -47,10 +48,14 @@ class CustomUserAdmin(UserAdmin):
     form = CustomUserChangeForm
     model = User
 
-    list_display = ('email', 'first_name', 'last_name', 'is_staff',)
+    list_display = ('username', 'email', 'first_name', 'last_name', 'is_staff',)
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'groups',)
-    search_fields = ('email', 'first_name', 'last_name',)
-    ordering = ('email',)
+    search_fields = ('username', 'email', 'first_name', 'last_name',)
+    ordering = ('email', 'username',)
+    filter_horizontal = (
+        "groups",
+        "user_permissions",
+    )
     readonly_fields = ['created', 'updated']
 
 admin.site.register(User, CustomUserAdmin)

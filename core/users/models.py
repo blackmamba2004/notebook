@@ -3,7 +3,7 @@ from django.core.mail import send_mail
 
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
-
+from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.utils import timezone
 # функция перевода на другой язык
 from django.utils.translation import gettext_lazy as _
@@ -15,7 +15,21 @@ class User(AbstractBaseUser, PermissionsMixin):
         MALE = 'M', 'Male'
         FEMALE = 'F', 'Female'
     
-    email = models.EmailField(_('email address'), unique=True, 
+    username_validator = UnicodeUsernameValidator()
+    username = models.CharField(
+        _("username"),
+        db_index=True,
+        max_length=150,
+        unique=True,
+        help_text=_(
+            "Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only."
+        ),
+        validators=[username_validator],
+        error_messages={
+            "unique": _("A user with that username already exists."),
+        },
+    )
+    email = models.EmailField(_('email address'), db_index=True, unique=True, 
                               error_messages={'unique': _('user with this email address already exists')})
     
     first_name = models.CharField(_('first name'), max_length=45, blank=True)
@@ -36,7 +50,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = []
+    EMAIL_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']
 
     class Meta:
         verbose_name = _("user")
@@ -63,4 +78,4 @@ class User(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     def __str__(self) -> str:
-        return self.get_full_name()
+        return self.email

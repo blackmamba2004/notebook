@@ -25,7 +25,7 @@ class NoteViewSet(viewsets.ModelViewSet):
         if self.action != 'list':
             return Note.objects.select_related('author')\
                    .only('id', 'title', 'content', 'author_id', 
-                         'author__first_name', 'author__last_name')
+                         'author__username')
         return Note.objects.all()
     
     # def get_permissions(self):

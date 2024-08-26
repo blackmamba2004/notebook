@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include, re_path
-from backend_api.views import NoteViewSet, Mailer
+from backend_api.views import NoteViewSet, Mailer, ConfirmEmailAPI
 from rest_framework_simplejwt import views
 from rest_framework import routers
 from .settings import DEBUG
@@ -31,6 +31,7 @@ urlpatterns = [
     path('api/v1/token/refresh/', views.TokenRefreshView.as_view(), name='token_refresh'),
     path('api/v1/token/verify/', views.TokenVerifyView.as_view(), name='token_verify'),
     path('api/v1/registration/', Mailer.as_view(), name='mailer'),
+    path('api/v1/<str:uuid>/<str:token>/', ConfirmEmailAPI.as_view(), name='confirm_email')
 ]
 
 

@@ -1,6 +1,12 @@
-from django.contrib.auth import authenticate
+from datetime import datetime, timedelta
+import jwt
+from core.settings import SECRET_KEY
+from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import render, redirect
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str, DjangoUnicodeDecodeError
 
 from rest_framework import generics, viewsets, status
 from rest_framework.decorators import action
@@ -11,10 +17,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from notes.models import Note
-from users.models import User
 from .permissions import IsOwner
-from .serializers import NoteListSerializer, NoteDetailSerializer, UserSerializer, EmailSerializer
+from .serializers import (NoteListSerializer, NoteDetailSerializer, 
+                          UserSerializer, EmailSerializer,
+                          RegistrationSerializer)
 
+User = get_user_model()
 
 class NoteViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
@@ -55,13 +63,22 @@ class Mailer(GenericAPIView):
     serializer_class = EmailSerializer
     MESSAGE = 'Привет, если вы не получали это письмо, то проигнорируйте его.'
     SENDER = 'a@gmail.com'
+    MAIN_LINK = 'http://127.0.0.1:8000/api/v1/'
 
     def post(self, request: Request, *args, **kwargs):
         
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             to_this_email = serializer.validated_data['email']
-            send_mail('Registration', f'{self.MESSAGE}', 
+
+            uuid = urlsafe_base64_encode(force_bytes(to_this_email))
+
+            token = jwt.encode({
+                'email': to_this_email,
+                'exp': datetime.now() + timedelta(minutes=10)
+            }, key=SECRET_KEY, algorithm='HS256')
+
+            send_mail('Registration', f'{self.MESSAGE}\n{self.MAIN_LINK}{uuid}/{token}/', 
                       self.SENDER, [to_this_email])
 
             return Response(
@@ -81,5 +98,45 @@ class Mailer(GenericAPIView):
 
 class ConfirmEmailAPI(GenericAPIView):
 
-    def post(self, request: Request, *args, **kwargs):
-        pass
+    def get(self, request: Request, *args, **kwargs):
+        uuid = kwargs.get('uuid')
+
+        token = kwargs.get('token')
+        try:
+            email = force_str(urlsafe_base64_decode(uuid))
+
+            if default_token_generator.check_token(email, token):
+                return Response(
+                    {
+                        'message': f'Письмо прочитано!, {email}'
+                    }
+                )
+            else:
+                return Response(
+                    {
+                        'error': 'Срок действия токена'
+                    }
+                )
+
+        except DjangoUnicodeDecodeError:
+            return Response(
+                {
+                    'error': 'Ошибка в декодировании ссылки!'
+                }
+            )
+
+
+# class RegistrationAPI(GenericAPIView):
+
+#     serializer_class = RegistrationSerializer
+#     def post(self, request: Request, *args, **kwargs):
+#         serializer = self.serializer_class(data=request.data)
+#         if serializer.is_valid():
+#             data = serializer.validated_data
+#             password = data.pop('password')
+#             User.objects.create_user(
+#                 username = data['username'],
+#                 email = data['email'], 
+#                 password=password
+#             )
+            

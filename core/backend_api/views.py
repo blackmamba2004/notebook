@@ -114,7 +114,7 @@ class ConfirmEmailAPI(GenericAPIView):
             else:
                 return Response(
                     {
-                        'error': 'Срок действия токена'
+                        'error': 'Срок действия токена истек'
                     }
                 )
 
